@@ -122,6 +122,12 @@ body {
   opacity: 0.8;
 }
 
+.hero-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
 .hero > *:not(#hero-bg-video) {
   position: relative;
   z-index: 1;
