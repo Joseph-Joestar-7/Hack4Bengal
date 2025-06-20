@@ -1,11 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TurfeX</title>
+    <title>TurfeX - Dynamic Local Pickup Game Finder</title>
+    <meta name="description"
+        content="Connect with local players instantly. Find pickup games, discover courts, and join the perfect match for your skill level." />
+    <link rel="stylesheet" href="../static/home.css">
 </head>
+
 <body>
-    <h1>TurfeX</h1>
+    <div class="homepage-container" id="homepage">
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+
+        <header class="header">
+            <div class="logo">TurfeX</div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+        </header>
+
+
+        <section class="hero">
+            <h1>TurfeX</h1>
+            <p>
+                Connect with local players instantly. Find pickup games, discover courts,
+                and join the perfect match for your skill level. Your next game is just a tap away.
+            </p>
+            <div class="button-group">
+                <button class="btn btn-primary">🚀 Get Started</button>
+                <button class="btn btn-secondary">Login</button>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose PickUpMatch?</h2>
+
+            <div class="feature-item">
+                <div class="feature-content">
+                    <h3>Smart Match Groups</h3>
+                    <p>Create or join match groups based on your location, skill level, and preferred sport. Our
+                        intelligent
+                        system ensures balanced and competitive games.</p>
+                </div>
+                <div class="feature-image">
+                    <img src="../static/assests/Smart Match Groups.jpg" alt="Smart Match Groups">
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-content">
+                    <h3>Real-time Chat</h3>
+                    <p>Coordinate with your teammates and opponents through our integrated chat feature. Plan
+                        strategies, share
+                        updates, and build lasting connections.</p>
+                </div>
+                <div class="feature-image">
+                    <img src="../static/assests/Real-time Chat.jpg" alt="Real-time Chat">
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-content">
+                    <h3>Location-Based Courts</h3>
+                    <p>Discover nearby courts and turfs with real-time availability. Check facilities, amenities, and
+                        book your
+                        preferred playing venue instantly.</p>
+                </div>
+                <div class="feature-image">
+                    <img src="../static/assests/Location-Based Courts.jpg" alt="Location-Based Courts">
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-content">
+                    <h3>Smart Notifications</h3>
+                    <p>Never miss a game with our intelligent notification system. Get reminders, match updates, and
+                        last-minute
+                        game opportunities.</p>
+                </div>
+                <div class="feature-image">
+                    <img src="../static/assests/Smart Notifications.jpg" alt="Smart Notifications">
+                </div>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-content">
+                    <h3>Player Ratings & Reviews</h3>
+                    <p>Build your reputation and find reliable teammates. Rate players, referees, and venues to help the
+                        community
+                        make informed decisions.</p>
+                </div>
+                <div class="feature-image">
+                    <img src="../static/assests/Player Ratings & Reviews.jpg" alt="Player Ratings & Reviews">
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-container">
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        How do I find games near me?
+                        <svg class="faq-arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="green" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 5.646a.5.5 0 0 1 .708 0L8 11.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+
+                    </div>
+                    <div class="faq-answer">
+                        Simply enable location services and browse available games in your area. You can filter by
+                        sport, skill level, and time preferences to find the perfect match.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        Is PickUpMatch free to use?
+                        <svg class="faq-arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="green" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 5.646a.5.5 0 0 1 .708 0L8 11.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+
+                    </div>
+                    <div class="faq-answer">
+                        Yes! Basic features like finding and joining games are completely free. Premium features include
+                        advanced analytics, priority booking, and exclusive tournaments.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        How does the skill level matching work?
+                        <svg class="faq-arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="green" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 5.646a.5.5 0 0 1 .708 0L8 11.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+
+                    </div>
+                    <div class="faq-answer">
+                        Our algorithm considers your self-reported skill level, game history, and community ratings to
+                        ensure balanced matches. You can always adjust your skill level as you improve.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        Can I organize my own games?
+                        <svg class="faq-arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="green" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 5.646a.5.5 0 0 1 .708 0L8 11.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+
+                    </div>
+                    <div class="faq-answer">
+                        Absolutely! Create your own match groups, set the rules, choose the venue, and invite players.
+                        You have full control over your organized games.
+                    </div>
+                </div>
+
+                <div class="faq-item" onclick="toggleFAQ(this)">
+                    <div class="faq-question">
+                        What sports are supported?
+                        <svg class="faq-arrow-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                            fill="green" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M1.646 5.646a.5.5 0 0 1 .708 0L8 11.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                        </svg>
+
+                    </div>
+                    <div class="faq-answer">
+                        We support basketball, soccer/football, tennis, cricket, volleyball, and many more. If your
+                        sport isn't listed, you can request it through our feedback system.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>PickUpMatch</h3>
+                    <ul>
+                        <li>About Us</li>
+                        <li>How It Works</li>
+                        <li>Success Stories</li>
+                        <li>Community Guidelines</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Find Games</li>
+                        <li>Create Groups</li>
+                        <li>Court Finder</li>
+                        <li>Player Ratings</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
+                    <ul>
+                        <li>Help Center</li>
+                        <li>Contact Us</li>
+                        <li>Report Issues</li>
+                        <li>Feedback</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li>Privacy Policy</li>
+                        <li>Terms of Service</li>
+                        <li>Cookie Policy</li>
+                        <li>Data Protection</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="social-icons">
+                <a href="#" target="_blank" aria-label="Twitter">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" alt="Twitter" />
+                </a>
+                <a href="#" target="_blank" aria-label="Instagram">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/instagram.svg" alt="Instagram" />
+                </a>
+                <a href="#" target="_blank" aria-label="Facebook">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/facebook.svg" alt="Facebook" />
+                </a>
+                <a href="mailto:support@pickupmatch.com" aria-label="Gmail">
+                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/gmail.svg" alt="Gmail" />
+                </a>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 PickUpMatch. All rights reserved. Made with 🩷 for sports enthusiasts.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ✅ JavaScript for dark mode and FAQ toggle -->
+    <script>
+        function toggleDarkMode() {
+            const container = document.getElementById('homepage');
+            container.classList.toggle('dark-mode');
+        }
+
+        function toggleFAQ(element) {
+            element.classList.toggle('active');
+        }
+    </script>
+
+    <!-- ✅ New scroll animation script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const items = document.querySelectorAll('.feature-item');
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = `fadeUp 0.8s ease forwards`;
+                        entry.target.style.animationDelay = `${index * 0.2}s`;
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.2
+            });
+
+            items.forEach(item => observer.observe(item));
+        });
+    </script>
 </body>
+
 </html>
