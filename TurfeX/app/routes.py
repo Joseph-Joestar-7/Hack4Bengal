@@ -3,6 +3,8 @@ from app.models import User
 from app.forms import SignInForm, SignUpForm
 from flask import render_template, redirect, url_for, session
 from functools import wraps
+from app.email_setup import send_email
+
 
 def get_current_user():
     if 'user_id' in session:
@@ -26,6 +28,7 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form=SignUpForm()
+    send_email(form.email_address.data, "Welcome to TurfeX", "Thank you for signing up for TurfeX! We are excited to have you on board.")
     if form.validate_on_submit():
         with app.app_context():
             user_data=User(username=form.username.data,
