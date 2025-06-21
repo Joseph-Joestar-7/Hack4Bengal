@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turf Registration Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="../static/turfDoc.css" />
+    <style>
+        .image-upload-area {
+            position: relative;
+            border: 2px dashed #bbb;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .image-upload-area:hover {
+            border-color: #888;
+        }
+
+        .image-upload-area .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-img {
+            display: block;
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 1rem;
+            border-radius: 4px;
+            object-fit: contain;
+        }
+
+        .error-message {
+            color: #c00;
+            margin-top: 0.5rem;
+        }
+
+        .image-upload-container {
+            margin-bottom: 1rem;
+        }
+
+        .add-images-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .add-images-btn:hover {
+            background: #f0f0f0;
+            border-color: #222;
+        }
+
+        .add-icon {
+            font-size: 1.25rem;
+            margin-right: 0.5rem;
+        }
+
+        .additional-images-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            min-height: 100px;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .no-images-placeholder {
+            color: #777;
+        }
+
+        .thumb {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .add-images-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: #444;
+            /* darker bg */
+            color: #fff;
+            /* white text */
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .add-images-btn:hover {
+            background: #333;
+            /* even darker on hover */
+            border-color: #222;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Register Your Turf</h1>
+            <p>
+                Join our platform and start accepting bookings for your sports
+                facility
+            </p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" id="turfForm" class="form-container">
+            {{ form.hidden_tag() }}
+
+            <div class="form-grid">
+                <!-- Left Side – Images -->
+                <div class="image-section">
+                    <div class="image-upload-container">
+                        <label for="main_image" class="image-upload-area" id="mainImageArea">
+                            <div>
+                                <strong>Click here to upload an image</strong><br>
+                                <small>(PNG, JPG, GIF up to 5 MB)</small>
+                            </div>
+                            {{ form.main_image(id="main_image", class="file-input") }}
+                        </label>
+
+                        <!-- This is where the preview will show up -->
+                        <img id="mainImagePreview" class="preview-img" src="#" alt="Image preview"
+                            style="display: none;" />
+
+                        {% if form.main_image.errors %}
+                        <div class="error-message">{{ form.main_image.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="image-upload-container">
+                        {{ form.additional_images.label(class="image-label") }}
+                        <button type="button" class="add-images-btn" id="addImagesBtn">
+                            <span class="add-icon">+</span>Add More Images
+                        </button>
+
+                        <div class="additional-images-container" id="additionalImagesContainer">
+                            <div class="no-images-placeholder">No additional images uploaded</div>
+                        </div>
+
+                        {{ form.additional_images(class="file-input", multiple=true, id="additionalImages") }}
+                    </div>
+
+
+                    <div class="text-sm text-gray-500 bg-blue-50 p-4 rounded-lg">
+                        <p class="font-medium text-blue-800 mb-2">Photo Guidelines:</p>
+                        <ul class="space-y-1 text-blue-700">
+                            <li>• Upload high-quality images</li>
+                            <li>• Show different angles of your turf</li>
+                            <li>• Include facility amenities</li>
+                            <li>• Maximum file size: 5MB per image</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Side – Fields -->
+                <div class="form-section">
+                    <!-- Basic Information -->
+                    <div class="section">
+                        <h3>Basic Information</h3>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                {{ form.turf_name.label }}
+                                {{ form.turf_name(class="form-control") }}
+                                {% if form.turf_name.errors %}<div class="error-message">{{ form.turf_name.errors[0] }}
+                                </div>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.owner_name.label }}
+                                {{ form.owner_name(class="form-control") }}
+                                {% if form.owner_name.errors %}<div class="error-message">{{ form.owner_name.errors[0]
+                                    }}</div>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.contact_no.label }}
+                                {{ form.contact_no(class="form-control") }}
+                                {% if form.contact_no.errors %}<div class="error-message">{{
+                                    form.contact_no.errors[0] }}</div>{% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form.email_address.label }}
+                                {{ form.email_address(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Location Details -->
+                    <div class="section">
+                        <h3>Location Details</h3>
+                        <div class="form-group">
+                            {{ form.address.label }}
+                            {{ form.address(class="form-control") }}
+                        </div>
+                        <br>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                {{ form.city.label }}
+                                {{ form.city(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.state.label }}
+                                {{ form.state(class="form-control") }}
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group half-width">
+                            {{ form.pincode.label }}
+                            {{ form.pincode(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <!-- Turf Details -->
+                    <div class="section">
+                        <h3>Turf Details</h3>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                            {{ form.capacity.label }}
+                            {{ form.capacity(class="form-control") }}
+                        </div>
+                            <div class="form-group select-wrapper">
+                                {{ form.turf_type.label }}
+                                {{ form.turf_type(class="form-control") }}
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                {{ form.cricket_price.label }}
+                                {{ form.cricket_price(class="form-control", step="0.01") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.football_price.label }}
+                                {{ form.football_price(class="form-control", step="0.01") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.tennis_price.label }}
+                                {{ form.tennis_price(class="form-control", step="0.01") }}
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Operating Hours -->
+                    <div class="section">
+                        <h3>Operating Hours</h3>
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                {{ form.opening_time.label }}
+                                {{ form.opening_time(class="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.closing_time.label }}
+                                {{ form.closing_time(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Facilities -->
+                    <div class="section">
+                        <h3>Available Facilities</h3>
+                        <div class="facilities-grid">
+                            {% for subfield in form.facilities %}
+                            <label class="facility-item form-check">
+                                {{ subfield(class="form-check-input") }}
+                                {{ subfield.label(class="form-check-label") }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="section">
+                        <div class="form-group">
+                            {{ form.description.label }}
+                            {{ form.description(class="form-control", rows=5) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="submit-section">
+                {{ form.submit(class="submit-btn btn btn-primary") }}
+            </div>
+        </form>
+
+    </div>
+    <script>
+        const input = document.getElementById('main_image');
+        const preview = document.getElementById('mainImagePreview');
+
+        input.addEventListener('change', function () {
+            const file = this.files[0];
+            if (!file) {
+                preview.style.display = 'none';
+                preview.src = '#';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+    </script>
+    <script>
+        const addBtn = document.getElementById('addImagesBtn');
+        const fileInput = document.getElementById('additionalImages');
+        const container = document.getElementById('additionalImagesContainer');
+        const placeholderTemplate = container.querySelector('.no-images-placeholder').cloneNode(true);
+        let allFiles = [];
+
+        // Clear last selection when opening picker so 'change' fires even for same file
+        // fileInput.addEventListener('click', () => {
+        //     fileInput.value = null;
+        // });
+
+        // open picker on button click
+
+        addBtn.addEventListener('click', () => {
+            fileInput.value = null;
+            // fileInput.click();
+        });
+
+        // handle new file selections
+        fileInput.addEventListener('change', () => {
+            const newFiles = Array.from(fileInput.files);
+            newFiles.forEach(f => {
+                if (!allFiles.some(existing => existing.name === f.name && existing.size === f.size)) {
+                    allFiles.push(f);
+                }
+            });
+            // rebuild UI
+            container.innerHTML = '';
+            if (allFiles.length === 0) {
+                container.appendChild(placeholderTemplate.cloneNode(true));
+            } else {
+                allFiles.forEach(file => {
+                    if (!file.type.startsWith('image/')) return;
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.classList.add('thumb');
+                        container.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            }
+            // update the FileList for form submission
+            const dt = new DataTransfer();
+            allFiles.forEach(f => dt.items.add(f));
+            fileInput.files = dt.files;
+        });
+    </script>
+
+
+    <script src="../static/turfDoc.js"></script>
+</body>
+
+</html>

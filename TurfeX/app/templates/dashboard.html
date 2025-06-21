@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +19,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="../static/dashboard.css">
     
     <script>
         tailwind.config = {
@@ -108,9 +109,9 @@
                         
                         <!-- Navigation Links -->
                         <div class="hidden md:flex items-center space-x-8">
-                            <a href="#" class="nav-link">Home</a>
-                            <a href="#" class="nav-link active">Dashboard</a>
-                            <a href="#" class="nav-link">Stats</a>
+                            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                            <a href="{{ url_for('dashboard') }}" class="nav-link active">Dashboard</a>
+                            <a href="{{ url_for('stats') }}" class="nav-link">Stats</a>
                             <a href="#" class="nav-link">AI Referee</a>
                         </div>
 
@@ -128,6 +129,11 @@
                                 U
                             </div>
                         </div>
+
+                        <a href="{{ url_for('logout') }}" class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                            Logout
+                        </a>
+
                     </div>
                 </div>
             </nav>
@@ -162,13 +168,13 @@
                             </div>
                         </div>
                         
-                        <button class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                        <a href="{{ url_for('live_match') }}" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
                             🔴 Live Matches
-                        </button>
+                        </a>
                         
-                        <button class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                        <a href="{{ url_for('create_match') }}" class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
                             ➕ Create Match
-                        </button>
+                        </a>
                     </div>
                 </div>
 
@@ -285,6 +291,6 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <!-- Custom JavaScript -->
-    <script src="dashboard.js"></script>
+    <script src="../static/dashboard.js"></script>
 </body>
 </html>

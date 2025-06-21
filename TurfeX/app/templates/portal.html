@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sports Turf Platform</title>
+  <link rel="stylesheet" href="../static/portal.css">
+</head>
+
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="main-title">Sports Turf Platform</h1>
+      <p class="subtitle">Connect Players with Premium Turf Facilities</p>
+    </header>
+
+    <main class="main-content">
+      <!-- <div class="divider"></div> -->
+
+      <section class="section player-section">
+        <div class="section-content">
+          <div class="section-icon"></div>
+          <h2 class="section-title">Login as Player</h2>
+          <p class="section-description">
+            Find and book premium turf facilities near you.
+            Join games, create teams, and elevate your sports experience.
+          </p>
+          <button class="get-started-btn">
+            <a href="{{ url_for('login') }}">Get Started</a>
+
+          </button>
+        </div>
+      </section>
+
+      <section class="section turf-section">
+        <div class="section-content">
+          <div class="section-icon"></div>
+          <h2 class="section-title">Login as Turf Owner</h2>
+          <p class="section-description">
+            Manage your turf facilities, handle bookings,
+            and grow your sports business with our platform.
+          </p>
+          <button class="get-started-btn">
+            <a href="{{ url_for('turf_login') }}">Get Started</a>
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="../static/portal.js"></script>
+</body>
+
+</html>
