@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Matches - TurfBook</title>
+    <meta name="description" content="Join live matches and find players for your games" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float-delayed 8s ease-in-out infinite',
+                        'slideInUp': 'slideInUp 0.6s ease-out forwards'
+                    },
+                    keyframes: {
+                        'float': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(0deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-20px) rotate(5deg)'
+                            }
+                        },
+                        'float-delayed': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(45deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-15px) rotate(50deg)'
+                            }
+                        },
+                        'slideInUp': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body class="font-inter overflow-x-hidden">
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Fixed 3D Background -->
+        <div class="fixed inset-0 z-0">
+            <!-- Light mode background -->
+            <div
+                class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 dark:opacity-0">
+            </div>
+
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-green-100/80 to-teal-50/90 dark:from-gray-900 dark:via-emerald-950 dark:to-gray-800 transition-all duration-500">
+            </div>
+            <div class="absolute inset-0 backdrop-blur-[2px]"></div>
+
+            <!-- 3D Floating Elements that move with scroll -->
+            <div class="floating-shape absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400/20 to-green-500/20 rounded-full animate-float transform-gpu"
+                style="transform: perspective(1000px) rotateX(45deg) rotateY(45deg);"></div>
+            <div class="floating-shape absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-teal-400/20 to-emerald-500/20 rounded-lg rotate-45 animate-float-delayed transform-gpu"
+                style="transform: perspective(1000px) rotateX(-30deg) rotateY(60deg);"></div>
+            <div class="floating-shape absolute bottom-32 left-1/3 w-20 h-20 bg-gradient-to-r from-green-400/20 to-teal-500/20 rounded-full animate-pulse transform-gpu"
+                style="transform: perspective(1000px) rotateX(30deg) rotateZ(15deg);"></div>
+            <div class="floating-shape absolute top-1/2 right-1/4 w-16 h-16 bg-gradient-to-r from-emerald-300/15 to-green-400/15 rounded-lg animate-float transform-gpu"
+                style="transform: perspective(1000px) rotateX(60deg) rotateY(-45deg);"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="relative z-20">
+            <!-- Fixed Glassmorphism Navbar -->
+            <nav id="navbar"
+                class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 top-0 z-50 backdrop-blur-xl text-gray-800 dark:text-white bg-white/10 dark:bg-black/10 border-b border-white/20 dark:border-gray-700/20 shadow-lg">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                    <div class="flex justify-between items-center h-20">
+                        <!-- Logo -->
+                        <div class="flex items-center">
+                            <div class="relative group">
+                                <div
+                                    class="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300">
+                                </div>
+                                <div
+                                    class="relative bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-lg font-bold text-xl shadow-lg transform transition-transform group-hover:scale-105">
+                                    🏟️ TurfBook
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Links -->
+                        <div class="hidden md:flex items-center space-x-8">
+                            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                            <a href="{{ url_for('stats') }}" class="nav-link">Stats</a>
+                            <a href="{{ url_for('live_match') }}" class="nav-link active">Live Matches</a>
+                        </div>
+
+                        <!-- Profile and Theme Toggle -->
+                        <div class="flex items-center space-x-4">
+                            <button id="theme-toggle"
+                                class="p-3 rounded-full bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all duration-300 transform hover:scale-110">
+                                <svg id="theme-icon-light" class="w-5 h-5 text-gray-800 dark:hidden" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                </svg>
+                                <svg id="theme-icon-dark" class="w-5 h-5 text-yellow-500 hidden dark:block"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd"
+                                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                                        clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            <div
+                                class="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transform transition-transform hover:scale-110">
+                                U
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <div class="relative pt-32 pb-12 text-center">
+                <div class="max-w-4xl mx-auto px-6">
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-800 dark:text-white mb-6 leading-tight">
+                        <span
+                            class="bg-gradient-to-r from-emerald-600 via-teal-500 to-green-500 bg-clip-text text-transparent">
+                            🔴 Live Matches
+                        </span>
+                    </h1>
+                    <p class="text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+                        Join active matches in your area. Find players and teams looking for one more player to complete
+                        their squad.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Search and Filter Section -->
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 mb-12">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-8">
+                    <div class="flex-1 max-w-md">
+                        <div class="relative">
+                            <input type="text" placeholder="Search matches, teams, locations..."
+                                class="w-full px-6 py-4 glass-card rounded-2xl text-gray-800 dark:text-gray-200 placeholder-gray-600 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all duration-300 shadow-lg">
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                <svg class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                        🎯 Filter Matches
+                    </button>
+
+                    <a href="{{ url_for('create_match') }}"
+                        class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                        ➕ Create Match
+                    </a>
+                </div>
+            </div>
+
+
+            <!-- Live Matches Grid -->
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 pb-20">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for entry in match_data %}
+                    {% set match = entry.obj %}
+                    {% set joined = entry.joined %}
+                    <div class="match-card glass-card rounded-3xl overflow-hidden shadow-2xl group">
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3
+                                    class="text-2xl font-bold text-gray-800 dark:text-white group-hover:text-emerald-600 transition-colors">
+                                    {{ match.teamName }}
+                                </h3>
+                                <div
+                                    class="bg-red-500/80 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
+                                    🔴 Live
+                                </div>
+                            </div>
+                            <div class="space-y-4 mb-8">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Game Type:</span>
+                                    <span
+                                        class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">
+                                        {{ match.gameType }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Turf:</span>
+                                    <span class="font-medium text-gray-800 dark:text-gray-200">{{ match.turfName
+                                        }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Location:</span>
+                                    <span class="font-medium text-gray-800 dark:text-gray-200">{{ match.location
+                                        }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Date/Time:</span>
+                                    <span class="font-medium text-gray-800 dark:text-gray-200">
+                                        {{ match.scheduledFor.strftime('%Y-%m-%d %H:%M') }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Players:</span>
+                                    <span class="font-bold text-orange-600 dark:text-orange-400">
+                                        {{ match.participants|length }} / {{ match.maxPlayers }}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400 text-sm font-medium">Skill:</span>
+                                    <span
+                                        class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                        {{ match.skill }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {% if joined %}
+                            <a href="{{ url_for('match_room', match_id=match.id) }}"
+                                class="block text-center bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-bold transition">
+                                🔗 View Room
+                            </a>
+                            {% elif match.status == 'open' %}
+                            <button data-match-id="{{ match.id }}" data-game-type="{{ match.gameType }}"
+                                class="join-btn w-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-2xl font-bold transition hover:scale-105">
+                                ⚡ Join Match
+                            </button>
+                            {% else %}
+                            <span
+                                class="block text-center opacity-75 bg-gray-500 text-white py-4 rounded-2xl font-bold">
+                                Match Closed
+                            </span>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div id="positionModal"
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden w-11/12 max-w-md p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-8">🏏 Pick your Position</h3>
+                    <form id="positionForm" method="POST" action="{{ url_for('join_match') }}">
+
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="match_id" id="modalMatchId">
+
+                        <!-- Dynamic Position dropdown -->
+                        <div class="mb-4">
+                            <label for="roleSelect" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Role</label>
+                            <select name="role" id="roleSelect" required
+                                class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-xl text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer">
+                                <!-- options injected by JS -->
+                            </select>
+                        </div>
+
+                        <!-- Modal actions -->
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancelBtn"
+                                class="flex-1 px-6 py-3 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-xl font-semibold hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="flex-1 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 transform">
+                                🎯 Join Match
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="relative z-20 mt-20">
+                <div class="glass-card border-t border-white/20 dark:border-gray-700/20">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-12">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                            <!-- Brand Section -->
+                            <div class="md:col-span-1">
+                                <div class="flex items-center mb-4">
+                                    <div
+                                        class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-2 rounded-lg font-bold text-lg">
+                                        🏟️ TurfBook
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4">
+                                    The ultimate platform for finding and booking sports venues. Connect with athletes
+                                    worldwide.
+                                </p>
+                            </div>
+
+                            <!-- Quick Links -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Quick Links</h3>
+                                <ul class="space-y-2">
+                                    <li><a href="dashboard.html"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Dashboard</a>
+                                    </li>
+                                    <li><a href="create.html"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Create
+                                            Match</a></li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Live
+                                            Matches</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Sports -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Sports</h3>
+                                <ul class="space-y-2">
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Football</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Basketball</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Tennis</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Cricket</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Contact -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-4">Contact</h3>
+                                <ul class="space-y-2">
+                                    <li class="text-gray-600 dark:text-gray-400">📧 hello@turfbook.com</li>
+                                    <li class="text-gray-600 dark:text-gray-400">📞 +1 (555) 123-4567</li>
+                                    <li class="text-gray-600 dark:text-gray-400">📍 123 Sports Avenue, City</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/20 dark:border-gray-700/20 mt-8 pt-8 text-center">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                © 2024 TurfBook. All rights reserved. Made with ❤️ for sports lovers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="../static/dashboard.js"></script>
+
+    <script>
+        // 1️⃣ Define positions by sport
+        const positionsByGame = {
+            cricket: ['Batsman', 'Bowler', 'Wicketkeeper', 'All-Rounder', 'Umpire'],
+            football: ['Striker', 'Midfielder', 'Defender', 'Goalkeeper'],
+            basketball: ['Point Guard', 'Shooting Guard', 'Small Forward', 'Power Forward', 'Center'],
+            tennis: ['Singles', 'Doubles'],
+            // …add more sports here…
+        };
+
+        // 2️⃣ Grab elements
+        const modal = document.getElementById('positionModal');
+        const matchInput = document.getElementById('modalMatchId');
+        const roleSelect = document.getElementById('roleSelect');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const joinBtns = document.querySelectorAll('.join-btn');
+
+        // 3️⃣ Wire up each Join button
+        joinBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const matchId = btn.dataset.matchId;
+                const gameType = btn.dataset.gameType;
+
+                // Store the match ID
+                matchInput.value = matchId;
+
+                // Clear out any old options
+                roleSelect.innerHTML = '';
+
+                // Lookup positions; fallback to a single generic option
+                const opts = positionsByGame[gameType] || ['Player'];
+                opts.forEach(pos => {
+                    const o = document.createElement('option');
+                    o.value = pos;
+                    o.text = pos;
+                    roleSelect.appendChild(o);
+                });
+
+                // Show the modal
+                modal.classList.remove('hidden');
+            });
+        });
+
+        // 4️⃣ Hide modal on cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+    </script>
+</body>
+
+</html>
