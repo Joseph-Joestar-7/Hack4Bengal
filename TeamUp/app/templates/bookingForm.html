@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>TeamUp Reserve Now</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='bookingForm.css') }}">
+</head>
+
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <h1>Book Your Turf</h1>
+        <p>Reserve your playing time at the best sports facility</p>
+      </div>
+      <button id="darkModeToggle" class="dark-mode-toggle">
+        <span class="sun-icon">☀️</span><span class="moon-icon">🌙</span>
+      </button>
+    </div>
+
+    <!-- DETAILS + LOAD SLOTS FORM -->
+    <form method="get" action="{{ url_for('booking', turf_id=turf.id) }}" class="booking-form">
+      {{ csrf_token() }}
+      <div class="main-content">
+        <!-- Turf Image -->
+        <div class="turf-image-section">
+          <div class="card">
+            {% for photo in turf.photos %}
+            {% if photo.profile_pic %}
+            <img src="{{ url_for('turf_photo', photo_id=photo.id) }}" alt="{{ turf.name }}" class="img">
+            {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        <!-- Turf Details -->
+        <div class="turf-details-section">
+          <div class="card">
+            <div class="card-header">
+              <h2>{{ turf.name }}</h2>
+            </div>
+            <div class="card-content">
+              <div class="detail-item">
+                <span class="icon">👤</span>
+                <span><strong>Owner:</strong> {{ turf.owner_name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="icon">📍</span>
+                <span><strong>Location:</strong> {{ turf.address }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="icon">🕐</span>
+                <span><strong>Timing:</strong> {{ turf.opening_time }} – {{ turf.closing_time }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="icon">🎮</span>
+                <label for="gameType"><strong>Game Type:</strong></label>
+                <select id="gameType" name="game_type" class="select-option"
+                  data-cricket-price="{{ turf.cricket_price }}" data-football-price="{{ turf.football_price }}"
+                  data-tennis-price="{{ turf.tennis_price }}">
+                  <option>Cricket</option>
+                  <option>Football</option>
+                  <option>Tennis</option>
+                </select>
+              </div>
+              <div class="detail-item">
+                <span class="icon">📅</span>
+                <label for="bookingDate"><strong>Select Date:</strong></label>
+                <input type="date" id="bookingDate" name="date" class="date-input" min="{{ current_date }}"
+                  max="{{ max_date }}" value="{{ sel_date }}">
+                <button type="submit" class="btn btn-secondary">Load Slots</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <!-- BOOKING + SUMMARY FORM -->
+    <form method="post" action="{{ url_for('booking', turf_id=turf.id) }}">
+
+      <!-- carry over the selected date + game_type -->
+      <input type="hidden" name="date" value="{{ sel_date }}">
+      <input type="hidden" name="game_type" value="{{ request.values.get('game_type','Cricket') }}">
+
+      <!-- Time Slots -->
+      <div class="card time-slots-section">
+        <div class="card-header">
+          <h3>Select Time Slots</h3>
+          <p class="subtitle">Choose consecutive hours</p>
+        </div>
+        <div class="card-content">
+          <div class="time-slots-grid">
+            {% for h in range(24) %}
+            {% set start = '%02d:00'|format(h) %}
+            {% set end = '%02d:00'|format((h+1)%24) %}
+
+            {% set out_of_hours = (h < opening_hour) or (h>= closing_hour) %}
+              {% set past_today = (sel_date == today_str) and (h <= now_hour) %} {% set already_booked=(h in
+                booked_indices) %} <label class="time-slot{% if out_of_hours or past_today or already_booked %}
+                disabled-slot{% endif %}">
+                <input type="checkbox" class="slot-checkbox" name="slots" value="{{ h }}" {% if out_of_hours or
+                  past_today or already_booked %}disabled{% endif %}>
+                {{ start }} – {{ end }}
+                </label>
+                {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Booking Summary -->
+      <div class="bottom-section">
+        <div class="booking-summary-section">
+          <div class="card">
+            <div class="card-header">
+              <h3>Booking Summary</h3>
+            </div>
+            <div class="card-content" id="bookingSummary">
+              <div class="no-selection">No time slots selected</div>
+            </div>
+          </div>
+        </div>
+        <!-- Payment Options -->
+        <div class="payment-section">
+          <div class="card">
+            <div class="card-header">
+              <h3>Payment Method</h3>
+            </div>
+            <div class="card-content">
+              <div class="payment-options">
+                <div class="payment-option">
+                  <input type="radio" id="cash" name="payment" value="cash" checked>
+                  <label for="cash">Pay in Cash</label>
+                </div>
+                <div class="payment-option">
+                  <input type="radio" id="online" name="payment" value="online">
+                  <label for="online">Pay Online</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirm Booking -->
+      <div class="submit-section">
+        <button type="submit" class="btn btn-primary btn-large">Confirm Booking</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Inline Script to Update Summary -->
+  <script>
+    (function () {
+      const checkboxes = Array.from(document.querySelectorAll('.slot-checkbox'));
+      const gameSelect = document.getElementById('gameType');
+      const summaryDiv = document.getElementById('bookingSummary');
+      const priceMap = {
+        Cricket: parseFloat(gameSelect.dataset.cricketPrice),
+        Football: parseFloat(gameSelect.dataset.footballPrice),
+        Tennis: parseFloat(gameSelect.dataset.tennisPrice)
+      };
+
+      function updateSummary() {
+        const chosen = checkboxes.filter(cb => cb.checked && !cb.disabled)
+          .map(cb => parseInt(cb.value, 10))
+          .sort((a, b) => a - b);
+        if (chosen.length === 0) {
+          summaryDiv.innerHTML = '<div class="no-selection">No time slots selected</div>';
+          return;
+        }
+        // ensure consecutive
+        for (let i = 0; i < chosen.length - 1; i++) {
+          if (chosen[i + 1] - chosen[i] !== 1) {
+            summaryDiv.innerHTML = '<div class="no-selection">Select consecutive slots only</div>';
+            return;
+          }
+        }
+        const start = String(chosen[0]).padStart(2, '0') + ':00';
+        const end = String((chosen[chosen.length - 1] + 1) % 24).padStart(2, '0') + ':00';
+        const hours = chosen.length;
+        const sport = gameSelect.value;
+        const total = hours * priceMap[sport];
+        summaryDiv.innerHTML = `
+          <div><strong>Time:</strong> ${start} – ${end}</div>
+          <div><strong>Hours:</strong> ${hours}</div>
+          <div><strong>Sport:</strong> ${sport}</div>
+          <div><strong>Total:</strong> ₹${total}</div>
+        `;
+      }
+
+      // watch checkboxes and sport changes
+      checkboxes.forEach(cb => cb.addEventListener('change', updateSummary));
+      gameSelect.addEventListener('change', updateSummary);
+    })();
+  </script>
+</body>
+
+</html>

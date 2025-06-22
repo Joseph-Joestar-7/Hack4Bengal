@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Nearby Turfs</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <style>
+    body, html { margin:0; padding:0; height:100%; }
+    #map { width:100%; height:100%; }
+  </style>
+</head>
+<body>
+  <h1>Nearby Turfs</h1>
+  <div id="map">
+    {%- if turf_map_html %}
+      {{ turf_map_html | safe }}
+    {%- endif %}
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // One‐time geolocation grab & redirect
+    if (!window.location.search.includes("lat=")) {
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const { latitude: lat, longitude: lon } = pos.coords;
+          window.location.href = `/map?lat=${lat}&lon=${lon}`;
+        },
+        () => {
+          // fallback to default
+          window.location.href = "/map";
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  </script>
+</body>
+</html>

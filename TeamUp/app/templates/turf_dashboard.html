@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Green Valley Sports Complex - TeamUp</title>
+    <meta name="description" content="Admin panel for managing Green Valley Sports Complex" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float-delayed 8s ease-in-out infinite',
+                        'slideInUp': 'slideInUp 0.6s ease-out forwards'
+                    },
+                    keyframes: {
+                        'float': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(0deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-20px) rotate(5deg)'
+                            }
+                        },
+                        'float-delayed': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(45deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-15px) rotate(50deg)'
+                            }
+                        },
+                        'slideInUp': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="dashboard.css">
+
+    <style>
+        .image-hover {
+            transition: transform 0.3s ease;
+        }
+
+        .image-hover:hover {
+            transform: scale(1.05);
+        }
+
+        .editable-field {
+            position: relative;
+            display: inline-block;
+        }
+
+        .edit-icon {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        .editable-field:hover .edit-icon {
+            opacity: 1;
+        }
+
+        .edit-input {
+            background: transparent;
+            border: 2px dashed rgba(52, 211, 153, 0.5);
+            border-radius: 8px;
+            padding: 4px 8px;
+            color: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+        }
+
+        .edit-input:focus {
+            outline: none;
+            border-color: rgb(52, 211, 153);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .edit-input:focus {
+            background: rgba(31, 41, 55, 0.1);
+        }
+
+        .reviews-scroll {
+            max-height: 250px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(52, 211, 153, 0.5) rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="font-inter overflow-x-hidden">
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Fixed 3D Background -->
+        <div class="fixed inset-0 z-0">
+            <!-- Light mode background -->
+            <div
+                class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 dark:opacity-0">
+            </div>
+
+            <div
+                class="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-green-100/80 to-teal-50/90 dark:from-gray-900 dark:via-emerald-950 dark:to-gray-800 transition-all duration-500">
+            </div>
+            <div class="absolute inset-0 backdrop-blur-[2px]"></div>
+
+            <!-- 3D Floating Elements that move with scroll -->
+            <div class="floating-shape absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400/20 to-green-500/20 rounded-full animate-float transform-gpu"
+                style="transform: perspective(1000px) rotateX(45deg) rotateY(45deg);"></div>
+            <div class="floating-shape absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-teal-400/20 to-emerald-500/20 rounded-lg rotate-45 animate-float-delayed transform-gpu"
+                style="transform: perspective(1000px) rotateX(-30deg) rotateY(60deg);"></div>
+            <div class="floating-shape absolute bottom-32 left-1/3 w-20 h-20 bg-gradient-to-r from-green-400/20 to-teal-500/20 rounded-full animate-pulse transform-gpu"
+                style="transform: perspective(1000px) rotateX(30deg) rotateZ(15deg);"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="relative z-20">
+            <!-- Fixed Glassmorphism Navbar -->
+            <nav id="navbar"
+                class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 top-0 z-50 backdrop-blur-xl bg-white/10 dark:bg-black/10 border-b border-white/20 dark:border-gray-700/20 shadow-lg">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                    <div class="flex justify-between items-center h-20">
+                        <!-- Logo -->
+                        <div class="flex items-center">
+                            <div class="relative group">
+                                <div
+                                    class="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300">
+                                </div>
+                                <div
+                                    class="relative bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-3 rounded-lg font-bold text-xl shadow-lg transform transition-transform group-hover:scale-105">
+                                    🏟️ TeamUp
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Links -->
+                        <div class="hidden md:flex items-center space-x-8">
+                            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                            <a href="{{ url_for('turf_dashboard') }}" class="nav-link">Dashboard</a>
+                            <a href="#" class="nav-link">Stats</a>
+                        </div>
+
+                        <!-- Profile and Theme Toggle -->
+                        <div class="flex items-center space-x-4">
+                            <button id="theme-toggle"
+                                class="p-3 rounded-full bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all duration-300 transform hover:scale-110">
+                                <svg id="theme-icon-light" class="w-5 h-5 text-gray-800 dark:hidden" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                </svg>
+                                <svg id="theme-icon-dark" class="w-5 h-5 text-yellow-500 hidden dark:block"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd"
+                                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                                        clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            <div
+                                class="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transform transition-transform hover:scale-110">
+                                U
+                            </div>
+                        </div>
+
+                        <a href="{{ url_for('turf_logout') }}"
+                            class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            {% for item in dashboard_data %}
+            <!-- Header Section -->
+            <div class="relative pt-32 pb-12">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                    <div class="text-center mb-8">
+                        <div class="editable-field">
+                            <h1 id="turf-name"
+                                class="text-5xl md:text-6xl font-bold text-gray-800 dark:text-white mb-4 leading-tight">
+                                <span
+                                    class="bg-gradient-to-r from-emerald-600 via-teal-500 to-green-500 bg-clip-text text-transparent">
+                                    {{ item.turf.name }}
+                                </span>
+                            </h1>
+                            <button
+                                class="edit-icon absolute -right-8 top-1/2 transform -translate-y-1/2 p-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                onclick="editTurfName()">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <br>
+                        <div class="editable-field">
+                            <p id="turf-address" class="text-xl text-gray-700 dark:text-gray-300 mb-6">
+                                📍 {{ item.turf.address }}
+                            </p>
+                            <button
+                                class="edit-icon absolute -right-8 top-1/3 transform -translate-y-1/2 p-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                onclick="editTurfAddress()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <div class="glass-card px-6 py-3 rounded-2xl">
+                                <span class="text-emerald-600 dark:text-emerald-400 font-semibold">⭐ 4.8 Rating</span>
+                            </div>
+                            <div class="glass-card px-6 py-3 rounded-2xl">
+                                <span class="text-teal-600 dark:text-teal-400 font-semibold">🏟️ Multiple Sports</span>
+                            </div>
+                            <div class="glass-card px-6 py-3 rounded-2xl">
+                                <span class="text-green-600 dark:text-green-400 font-semibold">🚗 Parking
+                                    Available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="max-w-7xl mx-auto px-6 lg:px-12 pb-20">
+                <!-- Venue Details Section -->
+                <div class="content-card mb-12">
+                    <div class="glass-card rounded-3xl p-8 shadow-2xl">
+                        <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+                            ℹ Venue Details
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div
+                                class="bg-white/10 dark:bg-gray-800/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-2xl">👤</span>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Owner</h3>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300">{{ item.turf.owner_name }}</p>
+                            </div>
+
+                            <div
+                                class="bg-white/10 dark:bg-gray-800/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-2xl">📞</span>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Contact</h3>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300">{{ item.turf.contact_no }}</p>
+                            </div>
+
+                            <div
+                                class="bg-white/10 dark:bg-gray-800/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-2xl">🕐</span>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Opening Time</h3>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300">{{ item.turf.opening_time }}</p>
+                            </div>
+
+                            <div
+                                class="bg-white/10 dark:bg-gray-800/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-2xl">🕘</span>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Closing Time</h3>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300">{{ item.turf.closing_time }}</p>
+                            </div>
+
+                            <div
+                                class="bg-white/10 dark:bg-gray-800/20 rounded-2xl p-6 backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                <div class="flex items-center space-x-3 mb-2">
+                                    <span class="text-2xl">👥</span>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Max Capacity</h3>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300">{{ item.turf.max_capacity }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-12">
+
+                    <!-- Left Column: Images -->
+                    <div class="lg:col-span-2 content-card">
+                        <div class="glass-card rounded-2xl p-8 shadow-2xl" id="venue-gallery"
+                            data-turf-id="{{ item.turf.id }}">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-3xl font-bold text-gray-800 dark:text-white flex items-center">
+                                    📸 Venue Gallery
+                                </h2>
+                                <button id="add-images-btn"
+                                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-300 transform shadow-md text-sm">
+                                    <span class="text-base">+</span> Add More Images
+                                </button>
+                            </div>
+
+                            <div class="mb-4">
+                                {% if item.primary_uri %}
+                                <img src="{{ item.primary_uri }}" alt="Primary view of {{ item.turf.name }}"
+                                    class="w-full h-64 object-cover rounded-xl shadow-lg">
+                                {% endif %}
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-8">
+                                {% for uri in item.additional_uris %}
+                                <img src="{{ uri }}" alt="Additional view of {{ item.turf.name }}"
+                                    class="w-full h-32 object-cover rounded-xl shadow-lg">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Pricing and Reviews -->
+                    <div class="space-y-6 lg:col-span-2">
+                        <!-- Hourly Prices -->
+                        <div class="content-card">
+                            <div class="glass-card rounded-2xl p-8 shadow-2xl">
+                                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    💰 Hourly Prices
+                                </h2>
+                                <div class="space-y-4" id="pricing-list">
+                                    <div
+                                        class="flex justify-between items-center py-4 px-6 bg-white/10 dark:bg-gray-800/20 rounded-2xl backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-2xl">🏏</span>
+                                            <span class="font-medium text-gray-800 dark:text-gray-200">Cricket (Full
+                                                Ground)</span>
+                                        </div>
+                                        <div class="editable-field flex items-center">
+                                            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-lg"
+                                                id="cricket-price" data-turf-id="{{ item.turf.id }}"
+                                                data-field="cricket_price">₹ {{ item.turf.cricket_price }} /hr</span>
+                                            <button
+                                                class="edit-icon ml-2 p-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                                onclick="editPrice('cricket-price')">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-4 px-6 bg-white/10 dark:bg-gray-800/20 rounded-2xl backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-2xl">⚽</span>
+                                            <span class="font-medium text-gray-800 dark:text-gray-200">Football (Full
+                                                Ground)</span>
+                                        </div>
+                                        <div class="editable-field flex items-center">
+                                            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-lg"
+                                                id="football-price" data-turf-id="{{ item.turf.id }}"
+                                                data-field="football_price">₹ {{ item.turf.football_price }} /hr</span>
+                                            <button
+                                                class="edit-icon ml-2 p-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                                onclick="editPrice('football-price')">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        class="flex justify-between items-center py-4 px-6 bg-white/10 dark:bg-gray-800/20 rounded-2xl backdrop-blur-sm border border-white/20 dark:border-gray-700/20">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-2xl">🎾</span>
+                                            <span class="font-medium text-gray-800 dark:text-gray-200">Tennis
+                                                Court</span>
+                                        </div>
+                                        <div class="editable-field flex items-center">
+                                            <span class="text-emerald-600 dark:text-emerald-400 font-bold text-lg"
+                                                id="tennis-price" data-turf-id="{{ item.turf.id }}"
+                                                data-field="tennis_price">₹ {{ item.turf.tennis_price }} /hr</span>
+                                            <button
+                                                class="edit-icon ml-2 p-1 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                                                onclick="editPrice('tennis-price')">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reviews Section -->
+                        <div class="content-card">
+                            <div class="glass-card rounded-3xl p-8 shadow-2xl">
+                                <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-4 flex items-center">
+                                    ⭐ Customer Reviews
+                                </h2>
+
+                                <div class="reviews-scroll space-y-4">
+                                    <!-- Review 1 -->
+                                    <div
+                                        class="bg-white/10 dark:bg-gray-800/20 rounded-xl p-4 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/30 transition-all duration-300">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">
+                                                    Rajesh Kumar</h4>
+                                                <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">2 days ago</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-sm">Excellent facilities! The
+                                            ground is well-maintained and the booking process was smooth. Highly
+                                            recommended for cricket matches.</p>
+                                    </div>
+
+                                    <!-- Review 2 -->
+                                    <div
+                                        class="bg-white/10 dark:bg-gray-800/20 rounded-xl p-4 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/30 transition-all duration-300">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Priya
+                                                    Sharma</h4>
+                                                <div class="flex text-yellow-400 text-sm">★★★★☆</div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">1 week ago</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-sm">Good facilities overall. The
+                                            tennis court is in great condition. Only minor issue was parking could be
+                                            better.</p>
+                                    </div>
+
+                                    <!-- Review 3 -->
+                                    <div
+                                        class="bg-white/10 dark:bg-gray-800/20 rounded-xl p-4 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/30 transition-all duration-300">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Amit
+                                                    Patel</h4>
+                                                <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">2 weeks ago</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-sm">Amazing experience! The
+                                            staff is very helpful and the equipment quality is top-notch. Will
+                                            definitely book again.</p>
+                                    </div>
+
+                                    <!-- Review 4 -->
+                                    <div
+                                        class="bg-white/10 dark:bg-gray-800/20 rounded-xl p-4 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/30 transition-all duration-300">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Neha
+                                                    Singh</h4>
+                                                <div class="flex text-yellow-400 text-sm">★★★★★</div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">3 weeks ago</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-sm">Perfect venue for our
+                                            company tournament. Great facilities and very responsive management team.
+                                        </p>
+                                    </div>
+
+                                    <!-- Review 5 -->
+                                    <div
+                                        class="bg-white/10 dark:bg-gray-800/20 rounded-xl p-4 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/30 transition-all duration-300">
+                                        <div class="flex items-start justify-between mb-2">
+                                            <div>
+                                                <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-sm">Ravi
+                                                    Gupta</h4>
+                                                <div class="flex text-yellow-400 text-sm">★★★★☆</div>
+                                            </div>
+                                            <span class="text-xs text-gray-600 dark:text-gray-400">1 month ago</span>
+                                        </div>
+                                        <p class="text-gray-700 dark:text-gray-300 text-sm">Good overall experience. The
+                                            badminton courts are excellent. Could use better lighting in the evening
+                                            sessions.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+
+            <!-- Footer -->
+            <footer class="relative z-20 mt-12">
+                <div class="glass-card border-t border-white/20 dark:border-gray-700/20">
+                    <div class="max-w-7xl mx-auto px-6 lg:px-12 py-8">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <!-- Brand Section -->
+                            <div class="md:col-span-1">
+                                <div class="flex items-center mb-3">
+                                    <div
+                                        class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-3 py-2 rounded-lg font-bold text-base">
+                                        🏟️ TeamUp
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 mb-4 text-sm">
+                                    The ultimate platform for finding and booking sports venues. Connect with athletes
+                                    worldwide.
+                                </p>
+                            </div>
+
+                            <!-- Quick Links -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-3 text-sm">Quick Links</h3>
+                                <ul class="space-y-2">
+                                    <li><a href="dashboard.html"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Dashboard</a>
+                                    </li>
+                                    <li><a href="create.html"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Create
+                                            Match</a></li>
+                                    <li><a href="live.html"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Live
+                                            Matches</a></li>
+                                </ul>
+                            </div>
+
+                            <!-- Sports -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-3 text-sm">Sports</h3>
+                                <ul class="space-y-2">
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Football</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Basketball</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Tennis</a>
+                                    </li>
+                                    <li><a href="#"
+                                            class="text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm">Cricket</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Contact -->
+                            <div>
+                                <h3 class="font-semibold text-gray-800 dark:text-white mb-3 text-sm">Contact</h3>
+                                <ul class="space-y-2">
+                                    <li class="text-gray-600 dark:text-gray-400 text-sm">📧 hello@teamUp.com</li>
+                                    <li class="text-gray-600 dark:text-gray-400 text-sm">📞 +1 (555) 123-4567</li>
+                                    <li class="text-gray-600 dark:text-gray-400 text-sm">📍 123 Sports Avenue, City</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-white/20 dark:border-gray-700/20 mt-6 pt-6 text-center">
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                                © 2025 TeamUp. All rights reserved. Made with ❤️ for sports lovers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="../static/turf_dashboard.js"></script>
+</body>
+
+</html>

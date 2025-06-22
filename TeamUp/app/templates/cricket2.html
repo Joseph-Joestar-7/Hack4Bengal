@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cricket Match Statistics - TeamUp</title>
+    <meta name="description" content="Cricket match statistics and player performance data" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float-delayed 8s ease-in-out infinite',
+                        'slideInUp': 'slideInUp 0.6s ease-out forwards'
+                    },
+                    keyframes: {
+                        'float': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(0deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-20px) rotate(5deg)'
+                            }
+                        },
+                        'float-delayed': {
+                            '0%, 100%': {
+                                transform: 'translateY(0px) rotate(45deg)'
+                            },
+                            '50%': {
+                                transform: 'translateY(-15px) rotate(50deg)'
+                            }
+                        },
+                        'slideInUp': {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(30px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="dashboard.css">
+    <style>
+        .stat-input {
+            background: transparent;
+            text-align: center;
+            width: 50px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-input-name {
+            background: transparent;
+
+            width: 125px;
+            transition: all 0.2s ease;
+        }
+
+        .stat-input:hover,
+        .stat-input:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(52, 211, 153, 0.5);
+            outline: none;
+        }
+
+        .dark .stat-input:hover,
+        .dark .stat-input:focus {
+            background: rgba(31, 41, 55, 0.2);
+        }
+
+        .add-player-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(52, 211, 153, 0.2);
+            border: 1px solid rgba(52, 211, 153, 0.5);
+            color: rgb(52, 211, 153);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .add-player-btn:hover {
+            background: rgba(52, 211, 153, 0.3);
+            transform: scale(1.1);
+        }
+
+        .match-status-input,
+        .match-result-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            padding: 0;
+            margin: 0;
+        }
+
+        .match-status-input:focus,
+        .match-result-input:focus {
+            background: rgba(16, 185, 129, 0.08);
+            /* emerald-500/10 */
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-emerald-900 font-inter text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300 relative overflow-x-hidden">
+    <div class="min-h-screen relative overflow-hidden">
+        <!-- Floating Background Elements -->
+        <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+            <div
+                class="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-emerald-400/20 to-teal-400/20 rounded-full blur-3xl animate-float">
+            </div>
+            <div
+                class="absolute top-40 right-10 w-96 h-96 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl">
+            </div>
+            <div
+                class="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-teal-400/20 to-emerald-400/20 rounded-full blur-3xl animate-float">
+            </div>
+        </div>
+
+        <!-- 3D Floating Elements that move with scroll -->
+        <div class="floating-shape absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400/20 to-green-500/20 rounded-full animate-float transform-gpu"
+            style="transform: perspective(1000px) rotateX(45deg) rotateY(45deg);"></div>
+        <div class="floating-shape absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-teal-400/20 to-emerald-500/20 rounded-lg rotate-45 animate-float-delayed transform-gpu"
+            style="transform: perspective(1000px) rotateX(-30deg) rotateY(60deg);"></div>
+        <div class="floating-shape absolute bottom-32 left-1/3 w-20 h-20 bg-gradient-to-r from-green-400/20 to-teal-500/20 rounded-full animate-pulse transform-gpu"
+            style="transform: perspective(1000px) rotateX(30deg) rotateZ(15deg);"></div>
+        <div class="floating-shape absolute top-1/2 right-1/4 w-16 h-16 bg-gradient-to-r from-emerald-300/15 to-green-400/15 rounded-lg animate-float transform-gpu"
+            style="transform: perspective(1000px) rotateX(60deg) rotateY(-45deg);"></div>
+        <div class="floating-shape absolute top-2/3 left-20 w-28 h-28 bg-gradient-to-r from-teal-300/15 to-emerald-400/15 rounded-full animate-float-delayed transform-gpu"
+            style="transform: perspective(1000px) rotateX(-20deg) rotateY(30deg);"></div>
+
+        <!-- Main Content -->
+        <div class="relative z-20">
+            <!-- Fixed Glassmorphism Navbar -->
+            <nav
+                class="fixed top-0 left-0 right-0 z-50 bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border-b border-white/20 dark:border-gray-700/50 shadow-lg">
+                <div class="max-w-7xl mx-auto px-6 lg:px-12">
+                    <div class="flex justify-between items-center h-20">
+                        <!-- Logo -->
+                        <div class="flex items-center">
+                            <div class="relative group">
+                                <div
+                                    class="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-lg blur opacity-75 group-hover:opacity-100 transition duration-300">
+                                </div>
+                                <div
+                                    class="relative bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-6 py-2 rounded-lg font-bold text-xl shadow-lg transform transition-transform group-hover:scale-105">
+                                    🏟️ TeamUp
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Links -->
+                        <div class="hidden md:flex items-center space-x-8">
+                            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+                            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+                            <a href="cricket.html" class="nav-link active">Statistics</a>
+                        </div>
+
+                        <!-- Profile and Theme Toggle -->
+                        <div class="flex items-center space-x-4">
+                            <button id="theme-toggle"
+                                class="p-3 rounded-full bg-white/10 dark:bg-gray-800/20 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-700/20 transition-all duration-300 transform hover:scale-110">
+                                <svg id="theme-icon-light" class="w-5 h-5 text-gray-800 dark:hidden" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                </svg>
+                                <svg id="theme-icon-dark" class="w-5 h-5 text-yellow-500 hidden dark:block"
+                                    fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd"
+                                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                                        clipRule="evenodd" />
+                                </svg>
+                            </button>
+                            <div
+                                class="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transform transition-transform hover:scale-110">
+                                U
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <br>
+            <!-- Main Content -->
+            <main class="pt-20 pb-12">
+                <div class="container mx-auto px-4 max-w-7xl">
+                    <!-- Match Header -->
+                    <div class="glass-card rounded-3xl p-6 mb-8 shadow-2xl">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">🏏 Match Statistics
+                                </h1>
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
+                                    <span class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                        {{ match.teamName }}
+                                    </span>
+                                    <span>📅 Date: {{ match.scheduledFor }}</span>
+                                    <span>🏟️ Venue: {{ match.turfName }}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-semibold text-emerald-600 dark:text-emerald-400">
+                                    <input type="text" value="Live Match"
+                                        class="match-status-input bg-transparent border-none text-emerald-600 dark:text-emerald-400 font-semibold text-lg w-full outline-none focus:bg-emerald-50/10 transition"
+                                        {% if not is_creator %} readonly disabled {% endif %}>
+                                </div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    <input type="text" value="In Progress"
+                                        class="match-result-input bg-transparent border-none text-gray-600 dark:text-gray-400 text-sm w-full outline-none focus:bg-emerald-50/10 transition"
+                                        {% if not is_creator %} readonly disabled {% endif %}>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Team Statistics -->
+                    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl mb-6">
+                        <div
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white p-4 flex flex-col gap-1">
+                            <input type="text" id="team1-name" value="{{ team1.name if team1 else '' }}"
+                                data-team-id="{{ team1.id if team1 else '' }}"
+                                class="team-input bg-transparent border-none text-white font-bold text-xl w-full outline-none focus:bg-white/10 transition"
+                                style="margin-bottom: 2px;" placeholder="Team 1 Name">
+                            <div class="flex items-center justify-between gap-8">
+                                <span id="team1-score" class="score-display text-blue-100 text-base">
+                                    <!-- Score: runs/wickets -->
+                                    {% set runs = team1_batting | sum(attribute='runs') %}
+                                    {% set wickets = team1_batting | selectattr('is_out','equalto',True) | list | length
+                                    %}
+                                    <strong>Score:</strong> {{ runs }}/{{ wickets }}
+                                </span>
+                                <span id="team1-overs" class="text-blue-100 text-base md:text-right flex-shrink-0">
+                                    <!-- Overs -->
+                                    {% set balls = team1_batting | sum(attribute='balls') %}
+                                    <strong>Overs:</strong> {{ (balls // 6) }}.{{ (balls % 6) }}
+                                </span>
+                                <span class="text-blue-100 text-base md:text-right flex-shrink-0">
+                                    Extras:
+                                    <input id="team1-extras" type="number" value="{{ team1_extras or 0 }}" min="0"
+                                        class="bg-transparent border-none text-blue-100 w-12 outline-none focus:bg-white/10 transition"
+                                        style="width:3rem;" onchange="updateTeamScore('team1')"
+                                        oninput="updateTeamScore('team1')">
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Batting Statistics -->
+                    <div class="p-6">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">🏏 Batting
+                            Performance</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm mb-6">
+                                <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="p-2 text-left">Batsman
+                                            {% if is_creator %}
+                                            <button onclick="addBatsman('team1-batting-tbody')"
+                                                class="ml-2 text-green-600">＋</button>
+                                            {% endif %}
+                                        </th>
+                                        <th class="p-2 text-center">Status</th>
+                                        <th class="p-2 text-center">R</th>
+                                        <th class="p-2 text-center">B</th>
+                                        <th class="p-2 text-center">4s</th>
+                                        <th class="p-2 text-center">6s</th>
+                                        <th class="p-2 text-center">SR</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="team1-batting-tbody" data-team-id="{{ team1.id if team1 else '' }}"
+                                    data-match-id="{{ match.id }}">
+                                    {% for br in team1_batting %}
+                                    <tr>
+                                        <td class="p-2">
+                                            <input type="text" value="{{ br.player.username }}" {% if not is_creator
+                                                %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                data-table="batting_records" data-record-id="{{ br.id }}"
+                                                data-field="player_id" class="w-60 text-sm stat-input-name" />
+                                        </td>
+                                        <td class="p-2 text-center">
+                                            <input type="text" value="{{ br.desc if br.desc is defined else '' }}"
+                                                data-table="batting_records" data-record-id="{{ br.id }}"
+                                                data-field="desc" class="w-60 text-center stat-input" />
+                                        </td>
+                                        {% for field in ['runs','balls','fours','sixes'] %}
+                                        <td class="p-2 text-center">
+                                            <input type="number" value="{{ getattr(br,field) }}" {% if not is_creator
+                                                %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                data-table="batting_records" data-record-id="{{ br.id }}"
+                                                data-field="{{ field }}" data-type="{{ field }}"
+                                                class="w-12 text-center" />
+                                        </td>
+                                        {% endfor %}
+                                        <td class="p-2 text-center strike-rate">
+                                            {{ '%.2f' % ((br.runs / br.balls * 100) if br.balls else 0) }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <!-- Bowling Statistics -->
+                            <h3 class="text-lg font-semibold mb-2">⚾ Bowling</h3>
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 dark:bg-gray-700">
+                                    <tr>
+                                        <th class="p-2 text-left">Bowler
+                                            {% if is_creator %}
+                                            <button onclick="addBowler('team1-bowling-tbody')"
+                                                class="ml-2 text-green-600">＋</button>
+                                            {% endif %}
+                                        </th>
+                                        <th class="p-2 text-center">O</th>
+                                        <th class="p-2 text-center">M</th>
+                                        <th class="p-2 text-center">R</th>
+                                        <th class="p-2 text-center">W</th>
+                                        <th class="p-2 text-center">Econ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="team1-bowling-tbody" data-team-id="{{ team1.id if team1 else '' }}"
+                                    data-match-id="{{ match.id }}">
+                                    {% for br in team1_bowling %}
+                                    <tr>
+                                        <td class="p-2">
+                                            <input type="text" value="{{ br.player.username }}" {% if not is_creator
+                                                %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                data-table="bowling_records" data-record-id="{{ br.id }}"
+                                                data-field="player_id" class="w-full text-sm stat-input-name" />
+                                        </td>
+                                        {% for field in ['overs','maidens','runs','wickets'] %}
+                                        <td class="p-2 text-center">
+                                            <input type="number" value="{{ getattr(br,field) }}" {% if not is_creator
+                                                %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                data-table="bowling_records" data-record-id="{{ br.id }}"
+                                                data-field="{{ field }}" data-type="{{ field }}"
+                                                class="w-12 text-center" />
+                                        </td>
+                                        {% endfor %}
+                                        <td class="p-2 text-center economy">
+                                            {{ '%.2f' % ((br.runs / br.overs) if br.overs else 0) }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Team 2 Statistics -->
+                        <div class="glass-card rounded-2xl overflow-hidden shadow-2xl mb-6">
+                            <div
+                                class="bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-600 dark:to-purple-700 text-white p-4 flex flex-col gap-1">
+                                <input type="text" id="team2-name" value="{{ team2.name if team2 else '' }}"
+                                    data-team-id="{{ team2.id if team2 else '' }}"
+                                    class="team-input bg-transparent border-none text-white font-bold text-xl w-full outline-none focus:bg-white/10 transition"
+                                    style="margin-bottom: 2px;" placeholder="Team 2 Name">
+                                <div class="flex items-center justify-between gap-8">
+                                    <span id="team2-score" class="score-display text-purple-100 text-base">
+                                        <!-- Score: runs/wickets -->
+                                        {% set runs2 = team2_batting | sum(attribute='runs') %}
+                                        {% set wickets2 = team2_batting | selectattr('is_out','equalto',True) | list |
+                                        length %}
+                                        <strong>Score:</strong> {{ runs2 }}/{{ wickets2 }}
+                                    </span>
+                                    <span id="team1-overs"
+                                        class="text-purple-100 text-base md:text-right flex-shrink-0">
+                                        <!-- Overs -->
+                                        {% set balls2 = team2_batting | sum(attribute='balls') %}
+                                        <strong>Overs:</strong> {{ (balls2 // 6) }}.{{ (balls2 % 6) }}
+                                    </span>
+                                    <span class="text-purple-100 text-base md:text-right flex-shrink-0">
+                                        Extras:
+                                        <input id="team2-extras" type="number" value="{{ team2_extras or 0 }}" min="0"
+                                            class="bg-transparent border-none text-purple-100 w-12 outline-none focus:bg-white/10 transition"
+                                            style="width:3rem;" onchange="updateTeamScore('team2')"
+                                            oninput="updateTeamScore('team2')">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-6 pb-6">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">🏏 Batting
+                                Performance</h3>
+                            <div class="overflow-x-auto">
+                                <!-- Batting Statistics -->
+                                <table class="w-full text-sm mb-6">
+                                    <thead class="bg-gray-100 dark:bg-gray-700">
+                                        <tr>
+                                            <th class="p-2 text-left">Batsman
+                                                {% if is_creator %}
+                                                <button onclick="addBatsman('team2-batting-tbody')"
+                                                    class="ml-2 text-green-600">＋</button>
+                                                {% endif %}
+                                            </th>
+                                            <th class="p-2 text-center">Status</th>
+                                            <th class="p-2 text-center">R</th>
+                                            <th class="p-2 text-center">B</th>
+                                            <th class="p-2 text-center">4s</th>
+                                            <th class="p-2 text-center">6s</th>
+                                            <th class="p-2 text-center">SR</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="team2-batting-tbody" data-team-id="{{ team2.id if team2 else '' }}"
+                                        data-match-id="{{ match.id }}">
+                                        {% for br in team2_batting %}
+                                        <tr>
+                                            <td class="p-2">
+                                                <input type="text" value="{{ br.player.username }}" {% if not is_creator
+                                                    %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                    data-table="batting_records" data-record-id="{{ br.id }}"
+                                                    data-field="player_id" class="w-60 text-sm stat-input-name" />
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <input type="text" value="{{ br.desc if br.desc is defined else '' }}"
+                                                    data-table="batting_records" data-record-id="{{ br.id }}"
+                                                    data-field="desc" class="w-60 text-center stat-input" />
+                                            </td>
+                                            {% for field in ['runs','balls','fours','sixes'] %}
+                                            <td class="p-2 text-center">
+                                                <input type="number" value="{{ getattr(br,field) }}" {% if not
+                                                    is_creator %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif
+                                                    %} data-table="batting_records" data-record-id="{{ br.id }}"
+                                                    data-field="{{ field }}" data-type="{{ field }}"
+                                                    class="w-12 text-center" />
+                                            </td>
+                                            {% endfor %}
+                                            <td class="p-2 text-center strike-rate">
+                                                {{ '%.2f' % ((br.runs / br.balls * 100) if br.balls else 0) }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                <!-- Bowling Statistics -->
+                                <h3 class="text-lg font-semibold mb-2">⚾ Bowling</h3>
+                                <table class="w-full text-sm">
+                                    <thead class="bg-gray-100 dark:bg-gray-700">
+                                        <tr>
+                                            <th class="p-2 text-left">Bowler
+                                                {% if is_creator %}
+                                                <button onclick="addBowler('team2-bowling-tbody')"
+                                                    class="ml-2 text-green-600">＋</button>
+                                                {% endif %}
+                                            </th>
+                                            <th class="p-2 text-center">O</th>
+                                            <th class="p-2 text-center">M</th>
+                                            <th class="p-2 text-center">R</th>
+                                            <th class="p-2 text-center">W</th>
+                                            <th class="p-2 text-center">Econ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="team2-bowling-tbody" data-team-id="{{ team2.id if team2 else '' }}"
+                                        data-match-id="{{ match.id }}">
+                                        {% for br in team2_bowling %}
+                                        <tr>
+                                            <td class="p-2">
+                                                <input type="text" value="{{ br.player.username }}" {% if not is_creator
+                                                    %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif %}
+                                                    data-table="bowling_records" data-record-id="{{ br.id }}"
+                                                    data-field="player_id" class="w-full text-sm stat-input-name" />
+                                            </td>
+                                            {% for field in ['overs','maidens','runs','wickets'] %}
+                                            <td class="p-2 text-center">
+                                                <input type="number" value="{{ getattr(br,field) }}" {% if not
+                                                    is_creator %}readonly class="bg-gray-100 dark:bg-gray-700" {% endif
+                                                    %} data-table="bowling_records" data-record-id="{{ br.id }}"
+                                                    data-field="{{ field }}" data-type="{{ field }}"
+                                                    class="w-12 text-center" />
+                                            </td>
+                                            {% endfor %}
+                                            <td class="p-2 text-center economy">
+                                                {{ '%.2f' % ((br.runs / br.overs) if br.overs else 0) }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <a id="show-mvp-btn" href="{{ url_for('match_mvp', match_id=match.id) }}"
+                            class="px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-2xl font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300 transform shadow-lg">
+                            GET MVP
+                        </a>
+
+                        <!-- Overall Player Statistics -->
+                        <!-- Add this below your Season Statistics section -->
+                        <div id="mvp-table-container" class="glass-card rounded-3xl p-6 shadow-2xl mt-8 hidden">
+                        </div>
+
+                        <!-- Win Ratio Section -->
+                        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div
+                                class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-2xl p-6 text-white shadow-xl">
+                                <h4 class="text-lg font-semibold mb-2">🏆 Team Win Ratio</h4>
+                                <div class="text-3xl font-bold">65.2%</div>
+                                <div class="text-emerald-100 text-sm">15 wins out of 23 matches</div>
+                            </div>
+                            <div
+                                class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-xl">
+                                <h4 class="text-lg font-semibold mb-2">📊 Avg Team Score</h4>
+                                <div class="text-3xl font-bold">168.4</div>
+                                <div class="text-blue-100 text-sm">runs per innings</div>
+                            </div>
+                            <div
+                                class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-xl">
+                                <h4 class="text-lg font-semibold mb-2">🎯 Avg Wickets</h4>
+                                <div class="text-3xl font-bold">7.2</div>
+                                <div class="text-purple-100 text-sm">wickets per match</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>const matchId = {{ match.id }};</script>
+    <script>
+        // Debounce helper to avoid rapid-fire requests
+        const debounce = (fn, ms = 300) => {
+            let t;
+            return (...a) => {
+                clearTimeout(t);
+                t = setTimeout(() => fn(...a), ms);
+            };
+        };
+
+        // Save a field to the backend
+        async function saveField(inp) {
+            const tbl = inp.dataset.table,
+                id = inp.dataset.recordId,
+                fld = inp.dataset.field,
+                val = inp.type === 'checkbox' ? inp.checked : inp.value;
+            const res = await fetch(`/api/scorecard/${tbl}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ [fld]: val })
+            });
+            if (!res.ok) console.error(await res.text());
+        }
+
+        // Attach saveField to all stat inputs
+        document.querySelectorAll('input[data-table]').forEach(i => {
+            const h = debounce(() => saveField(i), 300);
+            i.addEventListener('input', h);
+            i.addEventListener('change', h);
+        });
+
+        // Create a new record (batting or bowling)
+        async function createRecord(tbl, payload) {
+            const res = await fetch(`/api/scorecard/${tbl}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) throw await res.text();
+            return (await res.json()).id;
+        }
+
+        // After creating/updating a team, link it to the match
+        document.querySelectorAll('input[id^="team"][id$="name"]').forEach(inp => {
+            inp.addEventListener('blur', async function () {
+                const name = this.value.trim();
+                let teamId = this.dataset.teamId;
+                const teamNum = this.id.includes('team1') ? 1 : 2;
+                if (!teamId && name) {
+                    // Create new team
+                    const res = await fetch('/api/teams', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                    const data = await res.json();
+                    this.dataset.teamId = data.id;
+                    teamId = data.id;
+                } else if (teamId && name) {
+                    // Update existing team
+                    await fetch(`/api/teams/${teamId}`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                }
+                // Link team to match
+                if (teamId) {
+                    await fetch(`/api/matches/${matchId}/set_team`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ [`team${teamNum}_id`]: teamId })
+                    });
+                }
+            });
+        });
+
+        // Add a new batsman row (for either team)
+        const IS_CREATOR = {{ 'true' if is_creator else 'false' }};
+        async function addBatsman(tbodyId) {
+            const tb = document.getElementById(tbodyId),
+                matchId = +tb.dataset.matchId,
+                teamId = +tb.dataset.teamId;
+            const playerName = prompt("Enter player name:");
+            if (!playerName) return;
+            // Find or create user
+            let userId;
+            let res = await fetch(`/api/users?username=${encodeURIComponent(playerName)}`);
+            let data = await res.json();
+            if (data.id) {
+                userId = data.id;
+            } else {
+                res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: playerName })
+                });
+                data = await res.json();
+                userId = data.id;
+            }
+            let recId;
+            try { recId = await createRecord('batting_records', { match_id: matchId, team_id: teamId, player_id: userId }); }
+            catch (e) { return alert("Error: " + e); }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+<td class="p-2">
+  <input type="hidden" data-table="batting_records" data-record-id="${recId}"
+         data-field="player_id" value="${userId}">
+  <input type="text" value="${playerName}" 
+    ${!IS_CREATOR ? 'readonly class="bg-gray-100 dark:bg-gray-700"' : ''}
+    data-table="batting_records" data-record-id="${recId}" data-field="player_id"
+    class="w-40 text-sm stat-input-name" />
+</td>
+<td class="p-2 text-center">
+  <input type="text" value="Not Out"
+    data-table="batting_records" data-record-id="${recId}" data-field="desc"
+    class="w-60 text-center stat-input" />
+</td>
+
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="batting_records" data-record-id="${recId}" data-field="runs" data-type="runs" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="batting_records" data-record-id="${recId}" data-field="balls" data-type="balls" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="batting_records" data-record-id="${recId}" data-field="fours" data-type="fours" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="batting_records" data-record-id="${recId}" data-field="sixes" data-type="sixes" class="w-12"/></td>
+<td class="p-2 text-center strike-rate">0.00</td>`;
+            tb.appendChild(row);
+            row.querySelectorAll('input[data-table]').forEach(inp => {
+                const h = debounce(() => saveField(inp), 300);
+                inp.addEventListener('input', h);
+                inp.addEventListener('change', h);
+            });
+        }
+
+        // Add a new bowler row (for either team)
+        async function addBowler(tbodyId) {
+            const tb = document.getElementById(tbodyId),
+                matchId = +tb.dataset.matchId,
+                teamId = +tb.dataset.teamId;
+            const playerName = prompt("Enter bowler name:");
+            if (!playerName) return;
+            // Find or create user
+            let userId;
+            let res = await fetch(`/api/users?username=${encodeURIComponent(playerName)}`);
+            let data = await res.json();
+            if (data.id) {
+                userId = data.id;
+            } else {
+                res = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: playerName })
+                });
+                data = await res.json();
+                userId = data.id;
+            }
+            let recId;
+            try { recId = await createRecord('bowling_records', { match_id: matchId, team_id: teamId, player_id: userId }); }
+            catch (e) { return alert("Error: " + e); }
+            const row = document.createElement('tr');
+            row.innerHTML = `
+<td class="p-2">
+  <input type="hidden" data-table="bowling_records" data-record-id="${recId}"
+         data-field="player_id" value="${userId}">
+  <input type="text" value="${playerName}" 
+    ${!IS_CREATOR ? 'readonly class="bg-gray-100 dark:bg-gray-700"' : ''}
+    data-table="bowling_records" data-record-id="${recId}" data-field="player_id"
+    class="w-full text-sm stat-input-name"/>
+</td>
+<td class="p-2 text-center"><input type="number" step="0.1" value="0"
+  data-table="bowling_records" data-record-id="${recId}" data-field="overs" data-type="overs" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="bowling_records" data-record-id="${recId}" data-field="maidens" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="bowling_records" data-record-id="${recId}" data-field="runs" data-type="runs" class="w-12"/></td>
+<td class="p-2 text-center"><input type="number" value="0"
+  data-table="bowling_records" data-record-id="${recId}" data-field="wickets" class="w-12"/></td>
+<td class="p-2 text-center economy">0.00</td>`;
+            tb.appendChild(row);
+            row.querySelectorAll('input[data-table]').forEach(inp => {
+                const h = debounce(() => saveField(inp), 300);
+                inp.addEventListener('input', h);
+                inp.addEventListener('change', h);
+            });
+        }
+
+        // Recalculate strike rates and economy as user edits
+        document.addEventListener('input', e => {
+            const tr = e.target.closest('tr');
+            if (!tr) return;
+            // Batting SR
+            if (e.target.dataset.type === 'runs' || e.target.dataset.type === 'balls') {
+                const runs = +tr.querySelector('input[data-type="runs"]')?.value || 0,
+                    balls = +tr.querySelector('input[data-type="balls"]')?.value || 0,
+                    sr = balls ? (runs / balls * 100).toFixed(2) : '0.00';
+                tr.querySelector('.strike-rate').textContent = sr;
+            }
+            // Bowling Econ
+            if (e.target.dataset.type === 'runs' || e.target.dataset.type === 'overs') {
+                const runs = +tr.querySelector('input[data-type="runs"]')?.value || 0,
+                    o = +tr.querySelector('input[data-type="overs"]')?.value || 0,
+                    eco = o ? (runs / o).toFixed(2) : '0.00';
+                tr.querySelector('.economy').textContent = eco;
+            }
+        });
+
+        // Live update for team score and overs (optional, for extras)
+        function updateTeamScore(team) {
+            // Example for team1 or team2
+            const tbody = document.getElementById(`${team}-batting-tbody`);
+            let runs = 0, balls = 0, wickets = 0;
+            tbody.querySelectorAll('tr').forEach(tr => {
+                runs += +(tr.querySelector('input[data-field="runs"]')?.value || 0);
+                balls += +(tr.querySelector('input[data-field="balls"]')?.value || 0);
+                // If you have an is_out checkbox/field, count wickets
+                // You may need to adapt this if you use a checkbox for is_out
+                // Example: if (tr.querySelector('input[data-field="is_out"]')?.checked) wickets++;
+            });
+            const extras = +(document.getElementById(`${team}-extras`).value || 0);
+
+            const bowlingTeam = team === "team1" ? "team2" : "team1";
+            const bowlingTbody = document.getElementById(`${bowlingTeam}-bowling-tbody`);
+            let wicketsFromBowling = 0;
+            if (bowlingTbody) {
+                bowlingTbody.querySelectorAll('input[data-field="wickets"]').forEach(inp => {
+                    wicketsFromBowling += +(inp.value || 0);
+                });
+            }
+            const wicketsDisplay = wicketsFromBowling > 0 ? wicketsFromBowling : wickets;
+
+            document.getElementById(`${team}-score`).innerHTML =
+                `<strong>Score:</strong> ${runs + extras}/${wicketsDisplay}`;
+            const oversStr = `${Math.floor(balls / 6)}.${balls % 6}`;
+            const oversElem = document.querySelector(`#${team}-overs`);
+            if (oversElem) {
+                oversElem.textContent = `Overs: ${oversStr}`;
+            }
+        }
+
+        // Listen for changes to wickets in bowling tables and update the opposite team's score
+        ['team1', 'team2'].forEach(team => {
+            const bowlingTbody = document.getElementById(`${team}-bowling-tbody`);
+            if (bowlingTbody) {
+                bowlingTbody.addEventListener('input', function (e) {
+                    if (e.target && e.target.dataset.field === "wickets") {
+                        // Update the OPPOSITE team's score
+                        const battingTeam = team === "team1" ? "team2" : "team1";
+                        updateTeamScore(battingTeam);
+                    }
+                });
+            }
+        });
+
+        ['team1', 'team2'].forEach(team => {
+            const battingTbody = document.getElementById(`${team}-batting-tbody`);
+            if (battingTbody) {
+                battingTbody.addEventListener('input', function (e) {
+                    const tr = e.target.closest('tr');
+                    if (!tr) return;
+                    // If 4s or 6s changed, update runs
+                    if (e.target.dataset.field === "fours" || e.target.dataset.field === "sixes") {
+                        const fours = +(tr.querySelector('input[data-field="fours"]')?.value || 0);
+                        const sixes = +(tr.querySelector('input[data-field="sixes"]')?.value || 0);
+                        const runsInput = tr.querySelector('input[data-field="runs"]');
+                        // Optionally, add runs from other sources (manual runs input)
+                        // Here, runs = 4*fours + 6*sixes
+                        if (runsInput) {
+                            runsInput.value = (fours * 4 + sixes * 6).toString();
+                            saveField(runsInput);
+                        }
+                    }
+                    // Update score if any batting field changes
+                    if (["runs", "balls", "fours", "sixes"].includes(e.target?.dataset.field)) {
+                        updateTeamScore(team);
+                    }
+                });
+            }
+        });
+
+        // Update both team scores on page load
+        updateTeamScore('team1');
+        updateTeamScore('team2');
+    </script>
+
+    <script src="../static/dashboard.js"></script>
+</body>
+
+</html>
